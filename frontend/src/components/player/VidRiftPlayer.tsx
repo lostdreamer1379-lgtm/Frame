@@ -140,7 +140,8 @@ export function VidRiftPlayer({
     const win = iframeRef.current?.contentWindow;
     if (!win) return;
 
-    win.postMessage({ type: 'vidrift:resume', position: resumePosition }, VIDRIFT_ORIGIN);
+    // VidRift expects the seek target under `currentTime` (seconds).
+    win.postMessage({ type: 'vidrift:resume', currentTime: resumePosition }, VIDRIFT_ORIGIN);
     resumeSentRef.current = true;
   }, [status, resumePosition]);
 
