@@ -20,7 +20,7 @@ import {
 } from '@/hooks/useMovies';
 import { pickTrailer } from '@/services/movies.service';
 import { useWatchlist } from '@/hooks/useWatchlist';
-import { tmdbImage, formatRuntime, formatYear, languageName } from '@/utils/tmdb';
+import { tmdbImage, formatRuntime, formatYear, languageName, detailToMovie } from '@/utils/tmdb';
 import { ROUTES, buildRoute } from '@/lib/routes';
 
 export default function MovieDetailsPage() {
@@ -151,7 +151,7 @@ export default function MovieDetailsPage() {
                 size="lg"
                 variant="secondary"
                 icon={isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-                onClick={() => toggle(movie)}
+                onClick={() => toggle(detailToMovie(movie))}
               >
                 {isSaved ? 'Saved' : 'Add to Watchlist'}
               </Button>
@@ -208,7 +208,7 @@ export default function MovieDetailsPage() {
 
       <TrailerModal video={trailer} open={trailerOpen} onClose={() => setTrailerOpen(false)} />
       <AddToCollectionModal
-        movie={movie}
+        movie={detailToMovie(movie)}
         open={collectionModalOpen}
         onClose={() => setCollectionModalOpen(false)}
       />

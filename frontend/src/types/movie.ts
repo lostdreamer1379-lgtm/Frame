@@ -14,6 +14,7 @@ export interface Movie {
 }
 
 export interface MovieDetail extends Omit<Movie, 'genre_ids'> {
+  genre_ids?: number[];
   genres: Genre[];
   runtime: number | null;
   status: string;

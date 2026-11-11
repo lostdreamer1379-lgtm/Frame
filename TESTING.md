@@ -106,7 +106,7 @@ This is the manual QA pass for Phase 7. Run through it against a deployed (or lo
 
 - [ ] `npm run build` succeeds for both `frontend` and `backend` with zero errors
 - [ ] `npm run type-check` passes for both
-- [ ] Environment variables are set on both Vercel (frontend) and Render (backend) per `DEPLOYMENT.md` — no `.env` file was ever committed
+- [ ] Environment variables are set on both Vercel projects per `DEPLOYMENT.md` — no `.env` file was ever committed
 - [ ] The deployed frontend's API calls go to the deployed backend's URL, not `localhost`
 - [ ] Database migrations have been applied to the **production** Supabase project (not just a local/dev one)
 - [ ] Supabase's Site URL and Redirect URLs point at the production frontend domain (needed for password-reset and OAuth redirects to work)

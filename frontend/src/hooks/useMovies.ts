@@ -89,7 +89,7 @@ export function useSearchMovies(query: string, page = 1) {
   });
 }
 
-interface DiscoverFilters {
+export interface DiscoverFilters {
   page?: number;
   genre?: string;
   year?: string;
@@ -100,7 +100,7 @@ interface DiscoverFilters {
 
 export function useDiscoverMovies(filters: DiscoverFilters) {
   return useQuery({
-    queryKey: movieKeys.discover(filters),
+    queryKey: movieKeys.discover(filters as Record<string, unknown>),
     queryFn: () => moviesService.discover(filters),
   });
 }

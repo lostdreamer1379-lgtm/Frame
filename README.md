@@ -19,7 +19,7 @@ A premium, cinematic movie discovery and watching platform.
 | Auth | Supabase Authentication |
 | Movie data | TMDB API |
 | Playback | VidRift |
-| Deployment | Vercel (frontend) + Render (backend) + Supabase |
+| Deployment | Vercel (frontend + backend) + Supabase |
 
 ---
 
@@ -79,8 +79,7 @@ FRAME/
 │       ├── middleware/     auth (JWT verification), requireBackingServices, errorHandlers
 │       ├── validators/     Zod schemas per domain
 │       └── routes/
-├── prisma/schema.prisma   Profile, WatchlistEntry, WatchHistory, MovieCollection, CollectionMovie
-├── scripts/smoke-test.sh  Quick automated sanity check against a live backend
+├── backend/prisma/schema.prisma   Profile, WatchlistEntry, WatchHistory, MovieCollection, CollectionMovie
 ├── .github/workflows/ci.yml  Type-check + build on every push/PR
 ├── DEPLOYMENT.md          Step-by-step production deployment guide
 └── TESTING.md             Manual QA checklist

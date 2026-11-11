@@ -5,7 +5,7 @@ import type { Movie, MovieDetail } from '@/types/movie';
 const BASE_URL = 'https://image.tmdb.org/t/p';
 
 export const tmdbImage = {
-  poster: (path: string | null, size: 'w185' | 'w342' | 'w500' | 'w780' | 'original' = 'w342') =>
+  poster: (path: string | null, size: 'w92' | 'w185' | 'w342' | 'w500' | 'w780' | 'original' = 'w342') =>
     path ? `${BASE_URL}/${size}${path}` : null,
 
   backdrop: (path: string | null, size: 'w300' | 'w780' | 'w1280' | 'original' = 'w1280') =>

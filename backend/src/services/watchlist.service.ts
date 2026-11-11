@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import { getPrisma } from '../config/prisma';
 import { profileService } from './profile.service';
 import { AppError } from '../middleware/errorHandlers';
@@ -6,6 +5,13 @@ import { toApiStatus, toPrismaStatus, type ApiWatchlistStatus } from '../validat
 
 /** Prisma's "unique constraint violated" error code. */
 const UNIQUE_CONSTRAINT_VIOLATION = 'P2002';
+
+function isUniqueConstraintViolation(error: unknown): boolean {
+  return typeof error === 'object'
+    && error !== null
+    && 'code' in error
+    && (error as { code?: unknown }).code === UNIQUE_CONSTRAINT_VIOLATION;
+}
 
 function serialize(entry: {
   id: string; userId: string; tmdbMovieId: number; status: string;
@@ -62,7 +68,7 @@ export const watchlistService = {
       // our findUnique above and this create (e.g. a rapid double-click).
       // Rather than surface a 500 for what the user experiences as a no-op,
       // fetch and return the row the other request just created.
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === UNIQUE_CONSTRAINT_VIOLATION) {
+      if (isUniqueConstraintViolation(err)) {
         const winner = await prisma.watchlistEntry.findUnique({
           where: { userId_tmdbMovieId: { userId: profile.id, tmdbMovieId } },
         });

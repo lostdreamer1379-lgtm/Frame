@@ -1,9 +1,15 @@
-import { Prisma } from '@prisma/client';
 import { getPrisma } from '../config/prisma';
 import { profileService } from './profile.service';
 import { AppError } from '../middleware/errorHandlers';
 
 const UNIQUE_CONSTRAINT_VIOLATION = 'P2002';
+
+function isUniqueConstraintViolation(error: unknown): boolean {
+  return typeof error === 'object'
+    && error !== null
+    && 'code' in error
+    && (error as { code?: unknown }).code === UNIQUE_CONSTRAINT_VIOLATION;
+}
 
 function serializeCollection(c: {
   id: string; userId: string; name: string; description: string | null;
@@ -121,7 +127,7 @@ export const collectionsService = {
       // this exact movie between our findUnique and this create, that's not
       // really a failure from the user's point of view — the movie is in
       // the collection either way, so just return the current state.
-      const isDuplicate = err instanceof Prisma.PrismaClientKnownRequestError && err.code === UNIQUE_CONSTRAINT_VIOLATION;
+      const isDuplicate = isUniqueConstraintViolation(err);
       if (!isDuplicate) throw err;
     }
 
@@ -144,7 +150,7 @@ export const collectionsService = {
     await findOwnedCollection(prisma, profile.id, collectionId);
 
     const existingMovies = await prisma.collectionMovie.findMany({ where: { collectionId } });
-    const existingIds = new Set(existingMovies.map((m) => m.id));
+    const existingIds = new Set(existingMovies.map((m: { id: string }) => m.id));
     const providedIds = new Set(movieIds);
 
     if (existingIds.size !== providedIds.size || [...existingIds].some((id) => !providedIds.has(id))) {

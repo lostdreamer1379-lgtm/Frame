@@ -7,14 +7,15 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "postinstall": "prisma generate --schema=../prisma/schema.prisma",
+    "postinstall": "prisma generate --schema=prisma/schema.prisma",
+    "prebuild": "prisma generate --schema=prisma/schema.prisma",
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "type-check": "tsc --noEmit",
-    "db:generate": "dotenv -e .env -- prisma generate --schema=../prisma/schema.prisma",
-    "db:migrate": "dotenv -e .env -- prisma migrate dev --schema=../prisma/schema.prisma",
-    "db:push": "dotenv -e .env -- prisma db push --schema=../prisma/schema.prisma"
+    "db:generate": "dotenv -e .env -- prisma generate --schema=prisma/schema.prisma",
+    "db:migrate": "dotenv -e .env -- prisma migrate dev --schema=prisma/schema.prisma",
+    "db:push": "dotenv -e .env -- prisma db push --schema=prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^5.8.1",

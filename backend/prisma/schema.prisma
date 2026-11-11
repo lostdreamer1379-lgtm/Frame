@@ -1,0 +1,105 @@
+// FRAME — Prisma Schema
+// Database: Supabase PostgreSQL
+// ORM: Prisma
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Profile {
+  id                String    @id @default(cuid())
+  authUserId        String    @unique
+  displayName       String
+  avatarUrl         String?
+  preferredTheme    String    @default("cinema-night")
+  preferredLanguage String    @default("en")
+  preferredRegion   String    @default("US")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  watchlist   WatchlistEntry[]
+  watchHistory WatchHistory[]
+  collections MovieCollection[]
+
+  @@index([authUserId])
+  @@map("profiles")
+}
+
+model WatchlistEntry {
+  id          String         @id @default(cuid())
+  userId      String
+  tmdbMovieId Int
+  status      WatchlistStatus @default(PLANNING)
+  addedAt     DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbMovieId])
+  @@index([userId])
+  @@index([status])
+  @@map("watchlist_entries")
+}
+
+enum WatchlistStatus {
+  PLANNING
+  WATCHING
+  WATCHED
+  ON_HOLD
+  DROPPED
+}
+
+model WatchHistory {
+  id              String   @id @default(cuid())
+  userId          String
+  tmdbMovieId     Int
+  currentPosition Float    @default(0)
+  duration        Float?
+  completed       Boolean  @default(false)
+  lastWatchedAt   DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbMovieId])
+  @@index([userId])
+  @@index([lastWatchedAt])
+  @@map("watch_history")
+}
+
+model MovieCollection {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movies  CollectionMovie[]
+
+  @@index([userId])
+  @@map("movie_collections")
+}
+
+model CollectionMovie {
+  id           String         @id @default(cuid())
+  collectionId String
+  tmdbMovieId  Int
+  position     Int            @default(0)
+  addedAt      DateTime       @default(now())
+
+  collection MovieCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, tmdbMovieId])
+  @@index([collectionId])
+  @@map("collection_movies")
+}

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../generated/prisma';
 import { env, isDev } from './env';
 
 export function isDatabaseConfigured(): boolean {

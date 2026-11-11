@@ -16,10 +16,13 @@
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "db:generate": "cd backend && npm run db:generate",
     "db:migrate": "cd backend && npm run db:migrate",
-    "db:push": "cd backend && npm run db:push",
-    "smoke-test": "bash scripts/smoke-test.sh"
+    "db:push": "cd backend && npm run db:push"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
   }
 }
