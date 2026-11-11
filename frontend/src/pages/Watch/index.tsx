@@ -23,7 +23,7 @@ export default function WatchPage() {
   const { data: movie, isLoading, error } = useMovieDetails(id);
   const { data: historyEntry } = useMovieWatchHistory(movieId);
   const { data: similar, isLoading: similarLoading } = useSimilarMovies(id);
-  const updateHistory = useUpdateWatchHistory();
+  const { mutate: saveHistory } = useUpdateWatchHistory();
   const { watchlistIds, toggle } = useWatchlist();
 
   // Tracks the latest progress VidRift reported, independent of the save
@@ -31,18 +31,25 @@ export default function WatchPage() {
   // position even if the throttled timer hasn't fired yet.
   const lastProgressRef = useRef<VidRiftProgressEvent | null>(null);
   const lastSavedAtRef = useRef(0);
+  const saveInFlightRef = useRef(false);
 
   const saveProgress = useCallback((opts?: { completed?: boolean }) => {
     if (!user || !movieId || !lastProgressRef.current) return;
+    if (saveInFlightRef.current) return;
     const { currentTime, duration } = lastProgressRef.current;
-    updateHistory.mutate({
+    saveInFlightRef.current = true;
+    saveHistory({
       tmdbMovieId: movieId,
       currentPosition: currentTime,
       duration,
       completed: opts?.completed,
+    }, {
+      onSettled: () => {
+        saveInFlightRef.current = false;
+      },
     });
     lastSavedAtRef.current = Date.now();
-  }, [user, movieId, updateHistory]);
+  }, [user, movieId, saveHistory]);
 
   const handleProgress = useCallback((e: VidRiftProgressEvent) => {
     lastProgressRef.current = e;
