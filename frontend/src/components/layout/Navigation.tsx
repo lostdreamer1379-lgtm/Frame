@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Film, Compass, BookmarkCheck, Library, User, Menu, X, Search, Settings } from 'lucide-react';
+import { Film, Compass, BookmarkCheck, Library, User, Menu, X, Search, Settings, Orbit, ArrowUpRight } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
 
 const NAV_LINKS = [
@@ -79,6 +79,10 @@ export function Navigation() {
 
           {/* Desktop right */}
           <div className="hidden md:flex items-center gap-1 shrink-0">
+            <a href="https://frontend-worlds.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Enter Frontend Worlds (opens in a new tab)" title="Enter Frontend Worlds" className="group relative w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
+              <Orbit size={16} />
+              <ArrowUpRight size={9} className="absolute right-1.5 top-1.5 opacity-70" />
+            </a>
             {/* Inline search */}
             <AnimatePresence mode="wait">
               {searchOpen ? (
@@ -142,15 +146,20 @@ export function Navigation() {
             </NavLink>
           </div>
 
-          {/* Mobile toggle */}
-          <button
-            className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-            onClick={() => setMobileOpen(v => !v)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? <X size={17} /> : <Menu size={17} />}
-          </button>
+          {/* Mobile actions */}
+          <div className="md:hidden flex items-center gap-1 shrink-0">
+            <a href="https://frontend-worlds.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Enter Frontend Worlds (opens in a new tab)" className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
+              <Orbit size={17} />
+            </a>
+            <button
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+              onClick={() => setMobileOpen(v => !v)}
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? <X size={17} /> : <Menu size={17} />}
+            </button>
+          </div>
         </nav>
       </header>
 

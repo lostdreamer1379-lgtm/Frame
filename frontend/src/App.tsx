@@ -53,6 +53,7 @@ function PageLoader() {
 
 export default function App() {
   const [showOpening, setShowOpening] = React.useState(true);
+  const completeOpening = React.useCallback(() => setShowOpening(false), []);
 
   return (
     <AuthProvider>
@@ -109,7 +110,7 @@ export default function App() {
           {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
         </QueryClientProvider>
       </ThemeProvider>
-      {showOpening && <FrameOpening onComplete={() => setShowOpening(false)} />}
+      {showOpening && <FrameOpening onComplete={completeOpening} />}
     </AuthProvider>
   );
 }
