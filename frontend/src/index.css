@@ -278,12 +278,15 @@ a { color: inherit; text-decoration: none; }
   position: fixed;
   z-index: 100;
   inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
   overflow: hidden;
+  overscroll-behavior: none;
   display: grid;
   place-items: center;
   isolation: isolate;
-  min-height: 100vh;
-  min-height: 100dvh;
   background: radial-gradient(ellipse at 50% 48%, #21170f 0%, #0c0b0a 34%, #050505 78%);
   color: #f2e7ce;
   animation: frame-opening-in 0.7s ease both;
@@ -348,17 +351,19 @@ a { color: inherit; text-decoration: none; }
 @keyframes frame-worlds { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
 
 @media (max-width: 640px) {
-  .frame-opening__mark-wrap { width: min(86vw, 520px); }
+  .frame-opening__mark-wrap { width: min(82vw, 440px); max-height: 66dvh; }
+  .frame-opening__mark { max-height: 54dvh; object-fit: contain; }
   .frame-opening__line--top, .frame-opening__line--bottom { width: 82vw; }
   .frame-opening__line--left { left: 12%; }
   .frame-opening__line--right { right: 12%; }
   .frame-opening__world-card { display: none; }
-  .frame-opening__portal { width: min(92vw, 56vh, 520px); }
+  .frame-opening__portal { width: min(82vw, 48dvh, 420px); }
   .frame-opening__tagline { letter-spacing: .2em; }
+  .frame-opening__skip { right: max(16px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom)); }
 }
 
 @media (max-height: 520px) and (orientation: landscape) {
-  .frame-opening__mark-wrap { width: min(48vw, 58vh, 500px); }
+  .frame-opening__mark-wrap { width: min(48vw, 58dvh, 500px); }
   .frame-opening__line--top { top: 14%; }
   .frame-opening__line--bottom { bottom: 14%; }
   .frame-opening__line--left, .frame-opening__line--right { height: 58vh; }

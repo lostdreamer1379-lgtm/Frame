@@ -9,10 +9,18 @@ export function FrameOpening({ onComplete }: FrameOpeningProps) {
   const closeTimer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) {
       onComplete();
-      return;
+      return () => {
+        document.documentElement.style.overflow = previousHtmlOverflow;
+        document.body.style.overflow = previousBodyOverflow;
+      };
     }
 
     const timer = window.setTimeout(() => setClosing(true), 5000);
@@ -20,6 +28,8 @@ export function FrameOpening({ onComplete }: FrameOpeningProps) {
     return () => {
       window.clearTimeout(timer);
       if (closeTimer.current) window.clearTimeout(closeTimer.current);
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = previousBodyOverflow;
     };
   }, [onComplete]);
 
