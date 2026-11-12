@@ -121,7 +121,7 @@ export function HeroSection({ movie, movies = [], loading = false, isInWatchlist
       )}
 
       {/* Content */}
-      <div className="relative z-10 max-w-screen-xl mx-auto px-6 flex items-end" style={{ minHeight: '75vh', paddingBottom: '5rem' }}>
+      <div className="relative z-10 max-w-screen-xl mx-auto px-6 flex items-end" style={{ minHeight: '75vh', paddingBottom: '12rem' }}>
         <AnimatePresence mode="wait">
         <motion.div
           key={activeMovie.id}
@@ -183,7 +183,14 @@ export function HeroSection({ movie, movies = [], loading = false, isInWatchlist
       </div>
 
       {cards.length > 1 && (
-        <div ref={viewportRef} className="absolute inset-x-0 bottom-6 z-20 overflow-hidden px-6">
+        <div
+          ref={viewportRef}
+          className="absolute inset-x-0 bottom-5 z-20 overflow-hidden px-6"
+          style={{
+            maskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
+          }}
+        >
           <motion.div
             className="flex w-max gap-3 cursor-grab active:cursor-grabbing touch-pan-y"
             style={{ x }}
