@@ -13,6 +13,7 @@ import { watchlistRouter } from './routes/watchlist';
 import { historyRouter } from './routes/history';
 import { collectionsRouter } from './routes/collections';
 import { peopleRouter } from './routes/people';
+import { watchPartyRouter } from './routes/watchParty';
 import { notFoundHandler, errorHandler } from './middleware/errorHandlers';
 import { isTMDBConfigured } from './services/tmdb.service';
 
@@ -80,6 +81,7 @@ app.use('/api/watchlist',    watchlistRouter);
 app.use('/api/history',      historyRouter);
 app.use('/api/collections',  collectionsRouter);
 app.use('/api/people',       peopleRouter);
+app.use('/api/watch-parties', watchPartyRouter);
 
 // ─── Error handling ───────────────────────────────────────────────────────────
 app.use(notFoundHandler);

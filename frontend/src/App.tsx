@@ -16,6 +16,7 @@ const HomePage            = lazy(() => import('@/pages/Home'));
 const ExplorePage         = lazy(() => import('@/pages/Explore'));
 const MoviePage           = lazy(() => import('@/pages/MovieDetails'));
 const WatchPage           = lazy(() => import('@/pages/Watch'));
+const WatchPartyPage      = lazy(() => import('@/pages/WatchParty'));
 const WatchlistPage       = lazy(() => import('@/pages/Watchlist'));
 const CollectionsPage     = lazy(() => import('@/pages/Collections'));
 const CollectionDetailPage = lazy(() => import('@/pages/Collections/CollectionDetail'));
@@ -69,6 +70,7 @@ export default function App() {
                   <Route path={ROUTES.EXPLORE}     element={<ExplorePage />} />
                   <Route path={ROUTES.MOVIE}       element={<MoviePage />} />
                   <Route path={ROUTES.WATCH}       element={<WatchPage />} />
+                  <Route path={ROUTES.WATCH_PARTY} element={<WatchPartyPage />} />
                   <Route path={ROUTES.WATCHLIST}   element={<WatchlistPage />} />
                   <Route path={ROUTES.COLLECTIONS} element={<CollectionsPage />} />
                   <Route path={ROUTES.COLLECTION}  element={<CollectionDetailPage />} />

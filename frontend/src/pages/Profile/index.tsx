@@ -6,6 +6,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
+import { useWatchlist } from '@/hooks/useWatchlist';
+import { useWatchHistoryList } from '@/hooks/useHistory';
+import { useCollections } from '@/hooks/useCollections';
 import { THEMES } from '@/types/theme';
 import type { ThemeId } from '@/types/theme';
 import { Button } from '@/components/ui/Button';
@@ -163,11 +166,26 @@ export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const { theme, setTheme, resetTheme, syncing } = useTheme();
   const { data: profile } = useProfile();
+  const { entries: watchlistEntries, isLoading: watchlistLoading } = useWatchlist();
+  const { data: watchHistory, isLoading: historyLoading } = useWatchHistoryList();
+  const { data: collections, isLoading: collectionsLoading } = useCollections();
 
   const stats = [
-    { label: 'Movies Watched', value: '—', icon: <Film size={15} /> },
-    { label: 'Watchlist',      value: '—', icon: <BookmarkCheck size={15} /> },
-    { label: 'Collections',    value: '—', icon: <Library size={15} /> },
+    {
+      label: 'Movies Watched',
+      value: historyLoading ? '—' : String((watchHistory ?? []).filter((entry) => entry.completed).length),
+      icon: <Film size={15} />,
+    },
+    {
+      label: 'Watchlist',
+      value: watchlistLoading ? '—' : String(watchlistEntries.length),
+      icon: <BookmarkCheck size={15} />,
+    },
+    {
+      label: 'Collections',
+      value: collectionsLoading ? '—' : String((collections ?? []).length),
+      icon: <Library size={15} />,
+    },
   ];
 
   return (

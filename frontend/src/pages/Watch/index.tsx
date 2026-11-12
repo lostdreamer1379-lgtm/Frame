@@ -12,6 +12,7 @@ import { useMovieWatchHistory, useUpdateWatchHistory } from '@/hooks/useHistory'
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { tmdbImage, formatYear, formatRuntime } from '@/utils/tmdb';
 import { buildRoute, ROUTES } from '@/lib/routes';
+import { WatchPartyLauncher } from '@/components/movies/WatchPartyLauncher';
 
 const PROGRESS_SAVE_INTERVAL_MS = 10000;
 
@@ -169,9 +170,10 @@ export default function WatchPage() {
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed mt-2 max-w-2xl line-clamp-2">{movie.overview}</p>
             )}
           </div>
-          <Link to={buildRoute.movie(movie.id)} className="shrink-0">
-            <Button variant="secondary" size="sm" icon={<Info size={14} />}>Details</Button>
-          </Link>
+          <div className="shrink-0 flex items-center gap-2">
+            <WatchPartyLauncher movieId={movie.id} />
+            <Link to={buildRoute.movie(movie.id)}><Button variant="secondary" size="sm" icon={<Info size={14} />}>Details</Button></Link>
+          </div>
         </div>
 
         {/* Similar movies */}

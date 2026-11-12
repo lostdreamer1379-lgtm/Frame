@@ -13,7 +13,7 @@ import { ROUTES } from '@/lib/routes';
 export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const { signIn, signInWithGoogle, isConfigured } = useAuth();
+  const { signIn, isConfigured } = useAuth();
   const navigate = useNavigate();
   const location = useLocation() as { state?: { from?: string } };
 
@@ -139,15 +139,6 @@ export default function LoginPage() {
               Sign in
             </Button>
           </form>
-
-          <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[var(--border)]" /></div>
-            <div className="relative flex justify-center"><span className="px-3 text-xs text-[var(--text-muted)] bg-[var(--bg-secondary)]">or</span></div>
-          </div>
-
-          <Button fullWidth variant="secondary" disabled={!isConfigured} onClick={() => signInWithGoogle()}>
-            Continue with Google
-          </Button>
 
           <p className="text-center text-xs text-[var(--text-secondary)] mt-5">
             No account?{' '}
