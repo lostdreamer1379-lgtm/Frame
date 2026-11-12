@@ -9,4 +9,5 @@ watchPartyRouter.use(requireBackingServices);
 watchPartyRouter.post('/', requireAuth, watchPartyController.create);
 watchPartyRouter.get('/:code', optionalAuth, watchPartyController.get);
 watchPartyRouter.post('/:code/join', watchPartyController.join);
+watchPartyRouter.post('/:code/messages', watchPartyController.message);
 watchPartyRouter.put('/:code/state', requireAuth, watchPartyController.updateState);

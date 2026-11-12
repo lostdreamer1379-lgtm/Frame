@@ -14,6 +14,7 @@ function serialize(party: {
   id: string; code: string; hostUserId: string; tmdbMovieId: number;
   currentPosition: number; isPlaying: boolean; createdAt: Date; updatedAt: Date;
   lastActivityAt: Date; participants: { id: string; displayName: string; createdAt: Date; lastSeenAt: Date }[];
+  messages?: { id: string; participantId: string; text: string; createdAt: Date; participant: { displayName: string } }[];
 }) {
   return {
     id: party.id,
@@ -31,13 +32,23 @@ function serialize(party: {
       createdAt: participant.createdAt.toISOString(),
       lastSeenAt: participant.lastSeenAt.toISOString(),
     })),
+    messages: (party.messages ?? []).map((message) => ({
+      id: message.id,
+      participantId: message.participantId,
+      displayName: message.participant.displayName,
+      text: message.text,
+      createdAt: message.createdAt.toISOString(),
+    })),
   };
 }
 
 async function findByCode(code: string) {
   const party = await getPrisma().watchParty.findUnique({
     where: { code: code.toUpperCase() },
-    include: { participants: { orderBy: { createdAt: 'asc' } } },
+    include: {
+      participants: { orderBy: { createdAt: 'asc' } },
+      messages: { orderBy: { createdAt: 'asc' }, take: 100, include: { participant: { select: { displayName: true } } } },
+    },
   });
   if (!party) throw new AppError(404, 'Watch party not found', 'PARTY_NOT_FOUND');
   return party;
@@ -51,8 +62,16 @@ export const watchPartyService = {
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
         party = await prisma.watchParty.create({
-          data: { code: makeCode(), hostUserId: profile.id, tmdbMovieId },
-          include: { participants: true },
+          data: {
+            code: makeCode(),
+            hostUserId: profile.id,
+            tmdbMovieId,
+            participants: { create: { displayName: profile.displayName } },
+          },
+          include: {
+            participants: true,
+            messages: { include: { participant: { select: { displayName: true } } } },
+          },
         });
         break;
       } catch (error) {
@@ -80,6 +99,16 @@ export const watchPartyService = {
     });
     await prisma.watchParty.update({ where: { id: party.id }, data: { lastActivityAt: new Date() } });
     return { participantId: participant.id, party: serialize(await findByCode(code)) };
+  },
+
+  async sendMessage(code: string, participantId: string, text: string) {
+    const prisma = getPrisma();
+    const party = await findByCode(code);
+    const participant = party.participants.find((item) => item.id === participantId);
+    if (!participant) throw new AppError(403, 'Join the party before chatting', 'PARTY_MEMBER_REQUIRED');
+    await prisma.watchPartyMessage.create({ data: { partyId: party.id, participantId, text } });
+    await prisma.watchParty.update({ where: { id: party.id }, data: { lastActivityAt: new Date() } });
+    return serialize(await findByCode(code));
   },
 
   async updateState(authUserId: string, code: string, currentPosition: number, isPlaying: boolean) {

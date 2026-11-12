@@ -35,3 +35,12 @@ export function useUpdateWatchPartyState(code: string) {
     onSuccess: (party) => queryClient.setQueryData(watchPartyKeys.detail(code), party),
   });
 }
+
+export function useSendWatchPartyMessage(code: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ participantId, text }: { participantId: string; text: string }) =>
+      watchPartyService.sendMessage(code, participantId, text),
+    onSuccess: (party) => queryClient.setQueryData(watchPartyKeys.detail(code), party),
+  });
+}

@@ -7,6 +7,14 @@ export interface WatchPartyParticipant {
   lastSeenAt: string;
 }
 
+export interface WatchPartyMessage {
+  id: string;
+  participantId: string;
+  displayName: string;
+  text: string;
+  createdAt: string;
+}
+
 export interface WatchParty {
   id: string;
   code: string;
@@ -19,6 +27,7 @@ export interface WatchParty {
   updatedAt: string;
   lastActivityAt: string;
   participants: WatchPartyParticipant[];
+  messages: WatchPartyMessage[];
 }
 
 export const watchPartyService = {
@@ -36,6 +45,10 @@ export const watchPartyService = {
   },
   async updateState(code: string, currentPosition: number, isPlaying: boolean): Promise<WatchParty> {
     const { data } = await apiClient.put(`/watch-parties/${code}/state`, { currentPosition, isPlaying });
+    return data;
+  },
+  async sendMessage(code: string, participantId: string, text: string): Promise<WatchParty> {
+    const { data } = await apiClient.post(`/watch-parties/${code}/messages`, { participantId, text });
     return data;
   },
 };

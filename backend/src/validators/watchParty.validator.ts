@@ -16,3 +16,8 @@ export const updatePartyStateSchema = z.object({
   currentPosition: z.coerce.number().min(0).max(100000),
   isPlaying: z.boolean(),
 });
+
+export const partyMessageSchema = z.object({
+  participantId: z.string().min(1),
+  text: z.string().trim().min(1).max(500),
+});

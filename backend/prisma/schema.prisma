@@ -118,6 +118,7 @@ model WatchParty {
 
   host         Profile                @relation(fields: [hostUserId], references: [id], onDelete: Cascade)
   participants WatchPartyParticipant[]
+  messages     WatchPartyMessage[]
 
   @@index([hostUserId])
   @@index([lastActivityAt])
@@ -132,7 +133,22 @@ model WatchPartyParticipant {
   lastSeenAt  DateTime  @default(now())
 
   party WatchParty @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  messages WatchPartyMessage[]
 
   @@index([partyId])
   @@map("watch_party_participants")
+}
+
+model WatchPartyMessage {
+  id            String               @id @default(cuid())
+  partyId       String
+  participantId String
+  text          String
+  createdAt     DateTime             @default(now())
+
+  party         WatchParty            @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  participant   WatchPartyParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@index([partyId, createdAt])
+  @@map("watch_party_messages")
 }

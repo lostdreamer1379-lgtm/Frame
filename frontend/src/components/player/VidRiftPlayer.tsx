@@ -24,6 +24,8 @@ interface VidRiftPlayerProps {
   tmdbId: number;
   /** Saved playback position in seconds, if any — applied once via vidrift:resume. */
   resumePosition?: number;
+  /** Latest host state for a watch party. Applied only after the player is ready. */
+  syncState?: { position: number; isPlaying: boolean; revision: string };
   onProgress?: (event: VidRiftProgressEvent) => void;
   onPausedChange?: (paused: boolean) => void;
   onEnded?: () => void;
@@ -45,7 +47,7 @@ function toFiniteNumber(value: unknown): number | undefined {
 }
 
 export function VidRiftPlayer({
-  tmdbId, resumePosition, onProgress, onPausedChange, onEnded, className = '',
+  tmdbId, resumePosition, syncState, onProgress, onPausedChange, onEnded, className = '',
 }: VidRiftPlayerProps) {
   const [status, setStatus] = useState<PlayerStatus>('loading');
   const [reloadKey, setReloadKey] = useState(0);
@@ -56,6 +58,8 @@ export function VidRiftPlayer({
   const timeoutRef = useRef<number | null>(null);
   const resumeSentRef = useRef(false);
   const hasReceivedMessageRef = useRef(false);
+  const lastSyncRevisionRef = useRef<string | null>(null);
+  const lastPlayerTimeRef = useRef(0);
 
   const embedUrl = `${VIDRIFT_ORIGIN}/embed/movie/${tmdbId}`;
 
@@ -97,6 +101,7 @@ export function VidRiftPlayer({
           if (currentTime === undefined || currentTime < 0) return;
           markReady();
           onProgress?.({ currentTime, duration: toFiniteNumber(message.duration) });
+          lastPlayerTimeRef.current = currentTime;
           break;
         }
         case 'vidrift:paused':
@@ -144,6 +149,20 @@ export function VidRiftPlayer({
     win.postMessage({ type: 'vidrift:resume', currentTime: resumePosition }, VIDRIFT_ORIGIN);
     resumeSentRef.current = true;
   }, [status, resumePosition]);
+
+  // Keep invited viewers aligned with the host. VidRift receives commands only
+  // from this iframe's exact origin; the player ignores these when unsupported.
+  useEffect(() => {
+    if (status !== 'ready' || !syncState || syncState.revision === lastSyncRevisionRef.current) return;
+    const win = iframeRef.current?.contentWindow;
+    if (!win) return;
+    const drift = Math.abs(lastPlayerTimeRef.current - syncState.position);
+    if (drift > 1.5) {
+      win.postMessage({ type: 'vidrift:seek', currentTime: syncState.position }, VIDRIFT_ORIGIN);
+    }
+    win.postMessage({ type: syncState.isPlaying ? 'vidrift:play' : 'vidrift:pause' }, VIDRIFT_ORIGIN);
+    lastSyncRevisionRef.current = syncState.revision;
+  }, [status, syncState]);
 
   useEffect(() => clearReadyTimeout, [clearReadyTimeout]);
 

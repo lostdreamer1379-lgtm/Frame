@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, Copy, Users, Radio, Lock } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Copy, Send, Users, Radio, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { VidRiftPlayer, type VidRiftProgressEvent } from '@/components/player/VidRiftPlayer';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMovieDetails } from '@/hooks/useMovies';
-import { useJoinWatchParty, useUpdateWatchPartyState, useWatchParty } from '@/hooks/useWatchParty';
+import { useJoinWatchParty, useSendWatchPartyMessage, useUpdateWatchPartyState, useWatchParty } from '@/hooks/useWatchParty';
 import { ROUTES, buildRoute } from '@/lib/routes';
 import { notify } from '@/components/ui/Toast';
 
@@ -17,11 +17,22 @@ export default function WatchPartyPage() {
   const { data: movie, isLoading: movieLoading } = useMovieDetails(party?.tmdbMovieId);
   const joinParty = useJoinWatchParty(code ?? '');
   const updateState = useUpdateWatchPartyState(code ?? '');
+  const sendMessage = useSendWatchPartyMessage(code ?? '');
   const [displayName, setDisplayName] = useState(() => localStorage.getItem(`frame-party-name-${code}`) ?? '');
   const [participantId, setParticipantId] = useState(() => localStorage.getItem(`frame-party-member-${code}`));
   const [copied, setCopied] = useState(false);
+  const [chatText, setChatText] = useState('');
+  const [participantsOpen, setParticipantsOpen] = useState(true);
   const lastProgress = useRef<VidRiftProgressEvent | null>(null);
   const lastSentAt = useRef(0);
+  const isPlayingRef = useRef(false);
+
+  useEffect(() => {
+    if (party?.isHost && !participantId && party.participants[0]) {
+      setParticipantId(party.participants[0].id);
+      localStorage.setItem(`frame-party-member-${code}`, party.participants[0].id);
+    }
+  }, [party, participantId, code]);
 
   useEffect(() => {
     if (party && participantId && !party.participants.some((participant) => participant.id === participantId)) {
@@ -59,8 +70,18 @@ export default function WatchPartyPage() {
     lastProgress.current = event;
     if (party?.isHost && Date.now() - lastSentAt.current > 5000) {
       lastSentAt.current = Date.now();
-      sendState(event.currentTime, party.isPlaying);
+      sendState(event.currentTime, isPlayingRef.current);
     }
+  };
+
+  const handleChatSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const text = chatText.trim();
+    if (!text || !participantId || !code) return;
+    sendMessage.mutate({ participantId, text }, {
+      onSuccess: () => setChatText(''),
+      onError: () => notify.error('Could not send message'),
+    });
   };
 
   if (isLoading || movieLoading) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-white/15 border-t-[var(--accent)] animate-spin" /></div>;
@@ -101,18 +122,36 @@ export default function WatchPartyPage() {
               <VidRiftPlayer
                 tmdbId={movie.id}
                 resumePosition={party.currentPosition}
+                syncState={!party.isHost ? { position: party.currentPosition, isPlaying: party.isPlaying, revision: party.updatedAt } : undefined}
                 onProgress={handleProgress}
-                onPausedChange={(paused) => sendState(lastProgress.current?.currentTime ?? party.currentPosition, !paused)}
+                onPausedChange={(paused) => {
+                  isPlayingRef.current = !paused;
+                  sendState(lastProgress.current?.currentTime ?? party.currentPosition, !paused);
+                }}
                 onEnded={() => sendState(lastProgress.current?.currentTime ?? party.currentPosition, false)}
               />
-              <p className="text-xs text-[var(--text-muted)] mt-3">{party.isHost ? 'You are the host. Playback position is shared with the room.' : 'The host controls playback for everyone.'}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-3">{party.isHost ? 'You are the host. Play, pause, and seeking are shared with the room.' : 'The host controls playback for everyone.'}</p>
             </div>
             <aside className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5 h-fit">
-              <h2 className="font-display text-lg font-semibold text-[var(--text-primary)] mb-4">In this room</h2>
-              <div className="flex flex-col gap-3">
-                {party.participants.map((participant) => <div key={participant.id} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]"><span className="w-7 h-7 rounded-full bg-[var(--accent-muted-strong)] flex items-center justify-center text-xs text-[var(--accent)]">{participant.displayName.charAt(0).toUpperCase()}</span>{participant.displayName}{participant.id === participantId && <span className="ml-auto text-[10px] text-[var(--accent)]">you</span>}</div>)}
-              </div>
-              {!user && <div className="mt-5 pt-4 border-t border-[var(--border)] flex gap-2 text-xs text-[var(--text-muted)]"><Lock size={13} className="shrink-0" /> You can join as a guest. Sign in to host your own party.</div>}
+              <button type="button" onClick={() => setParticipantsOpen((open) => !open)} className="w-full flex items-center justify-between text-left">
+                <span className="flex items-center gap-2"><Users size={16} className="text-[var(--accent)]" /><span className="font-display text-lg font-semibold text-[var(--text-primary)]">Participants & Chat</span></span>
+                <ChevronDown size={16} className={`text-[var(--text-muted)] transition-transform ${participantsOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {participantsOpen && <>
+                <div className="mt-4 flex flex-col gap-3 max-h-44 overflow-y-auto">
+                  {party.participants.map((participant) => <div key={participant.id} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]"><span className="w-7 h-7 rounded-full bg-[var(--accent-muted-strong)] flex items-center justify-center text-xs text-[var(--accent)]">{participant.displayName.charAt(0).toUpperCase()}</span>{participant.displayName}{participant.id === participantId && <span className="ml-auto text-[10px] text-[var(--accent)]">you</span>}</div>)}
+                </div>
+                <div className="mt-5 pt-4 border-t border-[var(--border)]">
+                  <div className="h-44 overflow-y-auto flex flex-col gap-2 pr-1">
+                    {party.messages.length === 0 ? <p className="text-xs text-[var(--text-muted)]">Say hello to the room.</p> : party.messages.map((message) => <div key={message.id} className="text-xs"><span className="font-semibold text-[var(--accent)]">{message.displayName}</span><p className="text-[var(--text-secondary)] break-words">{message.text}</p></div>)}
+                  </div>
+                  <form onSubmit={handleChatSubmit} className="mt-3 flex gap-2">
+                    <input value={chatText} onChange={(event) => setChatText(event.target.value)} maxLength={500} placeholder="Message the room…" className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--input-bg)] px-3 py-2 text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent)]" />
+                    <Button type="submit" size="icon-sm" disabled={!chatText.trim() || sendMessage.isPending} icon={<Send size={13} />} aria-label="Send message" />
+                  </form>
+                </div>
+                {!user && <div className="mt-5 pt-4 border-t border-[var(--border)] flex gap-2 text-xs text-[var(--text-muted)]"><Lock size={13} className="shrink-0" /> You can join as a guest. Sign in to host your own party.</div>}
+              </>}
             </aside>
           </div>
         )}
