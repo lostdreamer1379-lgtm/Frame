@@ -39,8 +39,10 @@ export default function HomePage() {
       {heroMovie || heroLoading ? (
         <HeroSection
           movie={heroMovie}
+          movies={trending.data}
           loading={heroLoading}
           isInWatchlist={heroMovie ? watchlistIds.has(heroMovie.id) : false}
+          watchlistIds={watchlistIds}
           onWatchlistToggle={toggle}
         />
       ) : (
