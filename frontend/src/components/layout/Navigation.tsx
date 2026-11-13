@@ -190,7 +190,7 @@ export function Navigation() {
             <div className="world-transition__horizon" />
             <div className="world-transition__content">
               <span className="world-transition__eyebrow">A new dimension awaits</span>
-              <span className="world-transition__title">FRONTEND<br />WORLDS</span>
+              <span className="world-transition__title">ENTERING<br />WORLDS</span>
               <span className="world-transition__caption">Crossing the creative horizon</span>
             </div>
           </motion.div>
