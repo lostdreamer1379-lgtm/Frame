@@ -97,7 +97,7 @@ export function Navigation() {
 
           {/* Desktop right */}
           <div className="hidden md:flex items-center gap-1 shrink-0">
-            <button type="button" onClick={enterWorld} aria-label="Enter Frontend Worlds" title="Enter Frontend Worlds" className="group relative w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
+            <button type="button" onClick={enterWorld} aria-label="Enter Worlds" title="Enter Worlds" className="group relative w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
               <Orbit size={16} />
             </button>
             {/* Inline search */}
@@ -165,7 +165,7 @@ export function Navigation() {
 
           {/* Mobile actions */}
           <div className="md:hidden flex items-center gap-1 shrink-0">
-            <button type="button" onClick={enterWorld} aria-label="Enter Frontend Worlds" className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
+            <button type="button" onClick={enterWorld} aria-label="Enter Worlds" className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
               <Orbit size={17} />
             </button>
             <button
@@ -182,7 +182,7 @@ export function Navigation() {
 
       <AnimatePresence>
         {enteringWorld && (
-          <motion.div className="world-transition" role="status" aria-live="polite" aria-label="Entering Frontend Worlds" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div className="world-transition" role="status" aria-live="polite" aria-label="Entering Worlds" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="world-transition__nebula" />
             <div className="world-transition__stars" />
             <div className="world-transition__ring world-transition__ring--outer" />
