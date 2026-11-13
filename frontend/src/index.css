@@ -350,6 +350,38 @@ a { color: inherit; text-decoration: none; }
 @keyframes frame-mark-pullback { to { transform: perspective(900px) translateZ(-70px) scale(.78) rotateX(2deg); } }
 @keyframes frame-worlds { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
 
+/* ─── WORLD TRANSITION ───────────────────────────────────────────────────── */
+.world-transition { position: fixed; z-index: 120; inset: 0; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; display: grid; place-items: center; isolation: isolate; background: radial-gradient(ellipse at 50% 48%, #261d43 0%, #100d20 35%, #05050b 78%); color: #f8f3ff; }
+.world-transition::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 50%, transparent 12%, rgba(3,3,9,.2) 58%, #030308 100%); }
+.world-transition__nebula { position: absolute; inset: -25%; z-index: -1; background: conic-gradient(from 35deg at 50% 50%, transparent 0deg, rgba(138,97,239,.1) 45deg, transparent 105deg, rgba(61,192,213,.09) 180deg, transparent 245deg, rgba(202,126,255,.1) 310deg, transparent 360deg); filter: blur(24px); animation: world-nebula 8s linear infinite; }
+.world-transition__stars { position: absolute; inset: 0; background-image: radial-gradient(1px 1px at 9% 16%, #fff 50%, transparent 100%), radial-gradient(1px 1px at 22% 78%, #c5b3ff 50%, transparent 100%), radial-gradient(1.5px 1.5px at 83% 22%, #fff 50%, transparent 100%), radial-gradient(1px 1px at 76% 82%, #a9eaff 50%, transparent 100%), radial-gradient(1px 1px at 48% 12%, #fff 50%, transparent 100%), radial-gradient(1px 1px at 91% 57%, #c5b3ff 50%, transparent 100%), radial-gradient(1px 1px at 12% 52%, #fff 50%, transparent 100%); opacity: 0; animation: world-stars .9s ease .1s forwards; }
+.world-transition__ring { position: absolute; left: 50%; top: 50%; width: min(72vw, 72vh, 680px); aspect-ratio: 1; border: 1px solid rgba(211,191,255,.4); border-radius: 50%; box-shadow: 0 0 45px rgba(132,99,255,.2), inset 0 0 45px rgba(132,99,255,.1); opacity: 0; transform: translate(-50%,-50%) scale(.12) rotateX(66deg); }
+.world-transition__ring--outer { animation: world-gate 1.45s cubic-bezier(.13,.68,.22,1) forwards; }
+.world-transition__ring--inner { width: min(48vw, 48vh, 450px); border-color: rgba(144,224,255,.52); box-shadow: 0 0 70px rgba(99,184,255,.24), inset 0 0 50px rgba(99,184,255,.14); animation: world-gate-inner 1.45s cubic-bezier(.13,.68,.22,1) .08s forwards; }
+.world-transition__horizon { position: absolute; left: 50%; top: 50%; width: 160vmax; height: 160vmax; border-radius: 50%; border: 1px solid rgba(190,165,255,.18); box-shadow: 0 0 0 8vmax rgba(157,128,236,.035), 0 0 0 18vmax rgba(157,128,236,.025); transform: translate(-50%,-50%) scale(.04); animation: world-horizon 1.45s cubic-bezier(.15,.72,.25,1) forwards; }
+.world-transition__content { display: flex; flex-direction: column; align-items: center; gap: clamp(12px,2.5vh,24px); text-align: center; z-index: 1; animation: world-title 1.2s cubic-bezier(.2,.75,.2,1) .12s both; }
+.world-transition__eyebrow, .world-transition__caption { color: rgba(239,232,255,.62); font: 500 clamp(9px,1.1vw,12px)/1.4 Inter,sans-serif; letter-spacing: .32em; text-transform: uppercase; }
+.world-transition__title { font: 500 clamp(36px,9vw,112px)/.82 'Playfair Display',serif; letter-spacing: .08em; text-shadow: 0 0 30px rgba(173,148,255,.38); }
+.world-transition__caption { letter-spacing: .2em; }
+@keyframes world-nebula { to { transform: rotate(360deg) scale(1.04); } }
+@keyframes world-stars { to { opacity: .78; } }
+@keyframes world-gate { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.12) rotateX(66deg) rotate(-16deg); } 30% { opacity: .9; } 100% { opacity: .2; transform: translate(-50%,-50%) scale(2.1) rotateX(66deg) rotate(22deg); } }
+@keyframes world-gate-inner { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.08) rotateX(66deg) rotate(20deg); } 32% { opacity: .95; } 100% { opacity: .08; transform: translate(-50%,-50%) scale(2.6) rotateX(66deg) rotate(-18deg); } }
+@keyframes world-horizon { to { transform: translate(-50%,-50%) scale(1.4); } }
+@keyframes world-title { 0% { opacity: 0; transform: scale(.82) translateY(14px); filter: blur(8px); } 100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); } }
+@media (max-width: 640px) {
+  .world-transition__ring { width: min(84vw, 54dvh, 440px); }
+  .world-transition__ring--inner { width: min(60vw, 40dvh, 320px); }
+  .world-transition__eyebrow, .world-transition__caption { letter-spacing: .2em; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .world-transition__content { gap: 8px; }
+  .world-transition__title { font-size: clamp(32px,10vh,64px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-transition__nebula { animation: none; }
+}
+
 @media (max-width: 640px) {
   .frame-opening__mark-wrap { width: min(82vw, 440px); max-height: 66dvh; }
   .frame-opening__mark { max-height: 54dvh; object-fit: contain; }

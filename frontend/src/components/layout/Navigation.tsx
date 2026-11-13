@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Film, Compass, BookmarkCheck, Library, User, Menu, X, Search, Settings, Orbit, ArrowUpRight } from 'lucide-react';
+import { Film, Compass, BookmarkCheck, Library, User, Menu, X, Search, Settings, Orbit } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
 
 const NAV_LINKS = [
@@ -15,7 +15,9 @@ export function Navigation() {
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [searchOpen,   setSearchOpen]   = useState(false);
   const [searchQuery,  setSearchQuery]  = useState('');
+  const [enteringWorld, setEnteringWorld] = useState(false);
   const searchRef      = useRef<HTMLInputElement>(null);
+  const worldTimer     = useRef<number | undefined>(undefined);
   const location       = useLocation();
   const navigate       = useNavigate();
 
@@ -30,6 +32,22 @@ export function Navigation() {
   useEffect(() => {
     if (searchOpen) setTimeout(() => searchRef.current?.focus(), 50);
   }, [searchOpen]);
+
+  useEffect(() => () => {
+    if (worldTimer.current) window.clearTimeout(worldTimer.current);
+  }, []);
+
+  const enterWorld = () => {
+    if (enteringWorld) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.location.assign('https://frontend-worlds.vercel.app/');
+      return;
+    }
+    setEnteringWorld(true);
+    worldTimer.current = window.setTimeout(() => {
+      window.location.assign('https://frontend-worlds.vercel.app/');
+    }, 1450);
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,10 +97,9 @@ export function Navigation() {
 
           {/* Desktop right */}
           <div className="hidden md:flex items-center gap-1 shrink-0">
-            <a href="https://frontend-worlds.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Enter Frontend Worlds (opens in a new tab)" title="Enter Frontend Worlds" className="group relative w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
+            <button type="button" onClick={enterWorld} aria-label="Enter Frontend Worlds" title="Enter Frontend Worlds" className="group relative w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
               <Orbit size={16} />
-              <ArrowUpRight size={9} className="absolute right-1.5 top-1.5 opacity-70" />
-            </a>
+            </button>
             {/* Inline search */}
             <AnimatePresence mode="wait">
               {searchOpen ? (
@@ -148,9 +165,9 @@ export function Navigation() {
 
           {/* Mobile actions */}
           <div className="md:hidden flex items-center gap-1 shrink-0">
-            <a href="https://frontend-worlds.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Enter Frontend Worlds (opens in a new tab)" className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
+            <button type="button" onClick={enterWorld} aria-label="Enter Frontend Worlds" className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-muted)] transition-colors">
               <Orbit size={17} />
-            </a>
+            </button>
             <button
               className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
               onClick={() => setMobileOpen(v => !v)}
@@ -162,6 +179,23 @@ export function Navigation() {
           </div>
         </nav>
       </header>
+
+      <AnimatePresence>
+        {enteringWorld && (
+          <motion.div className="world-transition" role="status" aria-live="polite" aria-label="Entering Frontend Worlds" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="world-transition__nebula" />
+            <div className="world-transition__stars" />
+            <div className="world-transition__ring world-transition__ring--outer" />
+            <div className="world-transition__ring world-transition__ring--inner" />
+            <div className="world-transition__horizon" />
+            <div className="world-transition__content">
+              <span className="world-transition__eyebrow">A new dimension awaits</span>
+              <span className="world-transition__title">FRONTEND<br />WORLDS</span>
+              <span className="world-transition__caption">Crossing the creative horizon</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile menu */}
       <AnimatePresence>
